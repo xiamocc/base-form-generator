@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import Vue from 'vue'
 import { loadScriptQueue } from '@/utils/loadScript'
 import axios from 'axios'
@@ -15,15 +16,15 @@ const childAttrs = {
 
 window.addEventListener('message', init, false)
 
-function buildLinks(links) {
+function buildLinks (links) {
   let strs = ''
   links.forEach((url) => {
-    strs += `<link href="${url}" rel="stylesheet">`
+    strs += `<link href="${ url }" rel="stylesheet">`
   })
   return strs
 }
 
-function init(event) {
+function init (event) {
   if (event.data.type === 'refreshFrame') {
     const code = event.data.data
     const attrs = childAttrs[code.generateConf.type]
@@ -33,7 +34,7 @@ function init(event) {
       links = buildLinks(code.links)
     }
 
-    $previewApp.innerHTML = `${links}<style>${code.css}</style><div id="app"></div>`
+    $previewApp.innerHTML = `${ links }<style>${ code.css }</style><div id="app"></div>`
 
     if (Array.isArray(code.scripts) && code.scripts.length > 0) {
       loadScriptQueue(code.scripts, () => {
@@ -45,18 +46,18 @@ function init(event) {
   }
 }
 
-function newVue(attrs, main, html) {
-  main = eval(`(${main})`)
-  main.template = `<div>${html}</div>`
+function newVue (attrs, main, html) {
+  main = eval(`(${ main })`)
+  main.template = `<div>${ html }</div>`
   new Vue({
     components: {
       child: main,
     },
-    data() {
+    data () {
       return {
         visible: true,
       }
     },
-    template: `<div><child ${attrs}/></div>`,
+    template: `<div><child ${ attrs }/></div>`,
   }).$mount('#app')
 }

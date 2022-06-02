@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { isArray } from 'util'
 import { exportDefault, titleCase, deepClone } from '@/utils/index'
 import ruleTrigger from './ruleTrigger'
@@ -18,7 +19,7 @@ const inheritAttrs = {
  * @param {Object} formConfig 整个表单配置
  * @param {String} type 生成类型，文件或弹窗等
  */
-export function makeUpJs(formConfig, type) {
+export function makeUpJs (formConfig, type) {
   confGlobal = formConfig = deepClone(formConfig)
   const dataList = []
   const ruleList = []
@@ -57,7 +58,7 @@ export function makeUpJs(formConfig, type) {
 }
 
 // 构建组件属性
-function buildAttributes(
+function buildAttributes (
   scheme,
   dataList,
   ruleList,
@@ -76,9 +77,9 @@ function buildAttributes(
   if (scheme.options || (slot && slot.options && slot.options.length)) {
     buildOptions(scheme, optionsList)
     if (config.dataType === 'dynamic') {
-      const model = `${scheme.__vModel__}Options`
+      const model = `${ scheme.__vModel__ }Options`
       const options = titleCase(model)
-      const methodName = `get${options}`
+      const methodName = `get${ options }`
       buildOptionMethod(methodName, model, methodList, scheme)
       callInCreated(methodName, created)
     }
@@ -92,10 +93,11 @@ function buildAttributes(
   // 处理el-upload的action
   if (scheme.action && config.tag === 'el-upload') {
     uploadVarList.push(
-      `${scheme.__vModel__}Action: '${scheme.action}',
-      ${scheme.__vModel__}fileList: [],`
+      `${ scheme.__vModel__ }Action: '${ scheme.action }',
+      ${ scheme.__vModel__ }fileList: [],`
     )
     methodList.push(buildBeforeUpload(scheme))
+    methodList.push(buildOnSuccess(scheme))
     // 非自动上传时，生成手动上传的函数
     if (!scheme['auto-upload']) {
       methodList.push(buildSubmitUpload(scheme))
@@ -120,37 +122,37 @@ function buildAttributes(
 }
 
 // 在Created调用函数
-function callInCreated(methodName, created) {
-  created.push(`this.${methodName}()`)
+function callInCreated (methodName, created) {
+  created.push(`this.${ methodName }()`)
 }
 
 // 混入处理函数
-function mixinMethod(type) {
+function mixinMethod (type) {
   const list = []
   const minxins = {
     file: confGlobal.formBtns
       ? {
-          submitForm: `submitForm() {
-        this.$refs['${confGlobal.formRef}'].validate(valid => {
+        submitForm: `submitForm() {
+        this.$refs['${ confGlobal.formRef }'].validate(valid => {
           if(!valid) return
           // TODO 提交表单
         })
       },`,
-          resetForm: `resetForm() {
-        this.$refs['${confGlobal.formRef}'].resetFields()
+        resetForm: `resetForm() {
+        this.$refs['${ confGlobal.formRef }'].resetFields()
       },`,
-        }
+      }
       : null,
     dialog: {
       onOpen: 'onOpen() {},',
       onClose: `onClose() {
-        this.$refs['${confGlobal.formRef}'].resetFields()
+        this.$refs['${ confGlobal.formRef }'].resetFields()
       },`,
       close: `close() {
         this.$emit('update:visible', false)
       },`,
       handelConfirm: `handelConfirm() {
-        this.$refs['${confGlobal.formRef}'].validate(valid => {
+        this.$refs['${ confGlobal.formRef }'].validate(valid => {
           if(!valid) return
           this.close()
         })
@@ -169,15 +171,15 @@ function mixinMethod(type) {
 }
 
 // 构建data
-function buildData(scheme, dataList) {
+function buildData (scheme, dataList) {
   const config = scheme.__config__
   if (scheme.__vModel__ === undefined) return
   const defaultValue = JSON.stringify(config.defaultValue)
-  dataList.push(`${scheme.__vModel__}: ${defaultValue},`)
+  dataList.push(`${ scheme.__vModel__ }: ${ defaultValue },`)
 }
 
 // 构建校验规则
-function buildRules(scheme, ruleList) {
+function buildRules (scheme, ruleList) {
   const config = scheme.__config__
   if (scheme.__vModel__ === undefined) return
   const rules = []
@@ -185,12 +187,11 @@ function buildRules(scheme, ruleList) {
     if (config.required) {
       const type = isArray(config.defaultValue) ? "type: 'array'," : ''
       let message = isArray(config.defaultValue)
-        ? `请至少选择一个${config.label}`
+        ? `请至少选择一个${ config.label }`
         : scheme.placeholder
-      if (message === undefined) message = `${config.label}不能为空`
+      if (message === undefined) message = `${ config.label }不能为空`
       rules.push(
-        `{ required: true, ${type} message: '${message}', trigger: '${
-          ruleTrigger[config.tag]
+        `{ required: true, ${ type } message: '${ message }', trigger: '${ ruleTrigger[config.tag]
         }' }`
       )
     }
@@ -198,19 +199,18 @@ function buildRules(scheme, ruleList) {
       config.regList.forEach((item) => {
         if (item.pattern) {
           rules.push(
-            `{ pattern: ${eval(item.pattern)}, message: '${
-              item.message
-            }', trigger: '${ruleTrigger[config.tag]}' }`
+            `{ pattern: ${ eval(item.pattern) }, message: '${ item.message
+            }', trigger: '${ ruleTrigger[config.tag] }' }`
           )
         }
       })
     }
-    ruleList.push(`${scheme.__vModel__}: [${rules.join(',')}],`)
+    ruleList.push(`${ scheme.__vModel__ }: [${ rules.join(',') }],`)
   }
 }
 
 // 构建options
-function buildOptions(scheme, optionsList) {
+function buildOptions (scheme, optionsList) {
   if (scheme.__vModel__ === undefined) return
   // el-cascader直接有options属性，其他组件都是定义在slot中，所以有两处判断
   let { options } = scheme
@@ -218,71 +218,78 @@ function buildOptions(scheme, optionsList) {
   if (scheme.__config__.dataType === 'dynamic') {
     options = []
   }
-  const str = `${scheme.__vModel__}Options: ${JSON.stringify(options)},`
+  const str = `${ scheme.__vModel__ }Options: ${ JSON.stringify(options) },`
   optionsList.push(str)
 }
 
-function buildProps(scheme, propsList) {
-  const str = `${scheme.__vModel__}Props: ${JSON.stringify(
+function buildProps (scheme, propsList) {
+  const str = `${ scheme.__vModel__ }Props: ${ JSON.stringify(
     scheme.props.props
-  )},`
+  ) },`
   propsList.push(str)
 }
 
 // el-upload的BeforeUpload
-function buildBeforeUpload(scheme) {
+function buildBeforeUpload (scheme) {
   const config = scheme.__config__
   const unitNum = units[config.sizeUnit]
   let rightSizeCode = ''
   let acceptCode = ''
   const returnList = []
   if (config.fileSize) {
-    rightSizeCode = `let isRightSize = file.size / ${unitNum} < ${config.fileSize}
+    rightSizeCode = `let isRightSize = file.size / ${ unitNum } < ${ config.fileSize }
     if(!isRightSize){
-      this.$message.error('文件大小超过 ${config.fileSize}${config.sizeUnit}')
+      this.$message.error('文件大小超过 ${ config.fileSize }${ config.sizeUnit }')
     }`
     returnList.push('isRightSize')
   }
   if (scheme.accept) {
-    acceptCode = `let isAccept = new RegExp('${scheme.accept}').test(file.type)
+    acceptCode = `let isAccept = new RegExp('${ scheme.accept }').test(file.type)
     if(!isAccept){
-      this.$message.error('应该选择${scheme.accept}类型的文件')
+      this.$message.error('应该选择${ scheme.accept }类型的文件')
     }`
     returnList.push('isAccept')
   }
-  const str = `${scheme.__vModel__}BeforeUpload(file) {
-    ${rightSizeCode}
-    ${acceptCode}
-    return ${returnList.join('&&')}
+  const str = `${ scheme.__vModel__ }BeforeUpload(file) {
+    ${ rightSizeCode }
+    ${ acceptCode }
+    return ${ returnList.join('&&') }
   },`
   return returnList.length ? str : ''
 }
 
 // el-upload的submit
-function buildSubmitUpload(scheme) {
+function buildSubmitUpload (scheme) {
   const str = `submitUpload() {
-    this.$refs['${scheme.__vModel__}'].submit()
+    this.$refs['${ scheme.__vModel__ }'].submit()
   },`
   return str
 }
 
-function buildOptionMethod(methodName, model, methodList, scheme) {
+function buildOnSuccess (scheme) {
+  const str = `${ scheme.__vModel__ }OnSuccess(req, file, fileList) {
+    return console.log(req)
+  },`
+  return str
+}
+
+function buildOptionMethod (methodName, model, methodList, scheme) {
   const config = scheme.__config__
-  const str = `${methodName}() {
+  const str = `${ methodName }() {
     // 注意：this.$axios是通过Vue.prototype.$axios = axios挂载产生的
     this.$axios({
-      method: '${config.method}',
-      url: '${config.url}'
+      method: '${ config.method }',
+      url: '${ config.url }'
     }).then(resp => {
       var { data } = resp
-      this.${model} = data.${config.dataPath}
+      this.${ model } = data.${ config.dataPath }
     })
   },`
   methodList.push(str)
 }
 
 // js整体拼接
-function buildexport(
+function buildexport (
   conf,
   type,
   data,
@@ -293,31 +300,31 @@ function buildexport(
   methods,
   created
 ) {
-  const str = `${exportDefault}{
-  ${inheritAttrs[type]}
+  const str = `${ exportDefault }{
+  ${ inheritAttrs[type] }
   components: {},
   props: [],
   data () {
     return {
-      ${conf.formModel}: {
-        ${data}
+      ${ conf.formModel }: {
+        ${ data }
       },
-      ${conf.formRules}: {
-        ${rules}
+      ${ conf.formRules }: {
+        ${ rules }
       },
-      ${uploadVar}
-      ${selectOptions}
-      ${props}
+      ${ uploadVar }
+      ${ selectOptions }
+      ${ props }
     }
   },
   computed: {},
   watch: {},
   created () {
-    ${created}
+    ${ created }
   },
   mounted () {},
   methods: {
-    ${methods}
+    ${ methods }
   }
 }`
   return str

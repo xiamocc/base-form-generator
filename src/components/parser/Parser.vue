@@ -47,8 +47,8 @@
         )
       }
       return (
-        <el-col span={scheme.span}>
-          <el-row gutter={scheme.gutter}>{child}</el-row>
+        <el-col span={scheme.__config__.span}>
+          <el-row gutter={this.formConfCopy.gutter}>{child}</el-row>
         </el-col>
       )
     },
@@ -76,7 +76,8 @@
     )
   }
 
-  function formBtns() {
+  // eslint-disable-next-line no-unused-vars
+  function formBtns(h) {
     return (
       <el-col>
         <el-form-item size="large">
@@ -121,6 +122,9 @@
     Object.keys(methods).forEach((key) => {
       listeners[key] = (event) => methods[key].call(this, event)
     })
+    listeners.upload = (file) => {
+      setValue.call(this, [file], config, scheme)
+    }
     // 响应 render.js 中的 vModel $emit('input', val)
     listeners.input = (event) => setValue.call(this, event, config, scheme)
 

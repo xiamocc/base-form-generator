@@ -1,7 +1,7 @@
 <template>
   <div class="test-form">
     <parser :form-conf="formConf" @submit="sumbitForm1" />
-    <parser :key="key2" :form-conf="formConf" @submit="sumbitForm2" />
+    <!-- <parser :key="key2" :form-conf="formConf" @submit="sumbitForm2" /> -->
     <el-button @click="change">
       change
     </el-button>
@@ -26,116 +26,48 @@
           fields: [
             {
               __config__: {
-                label: '单行文本',
-                labelWidth: null,
-                showLabel: true,
-                changeTag: true,
-                tag: 'el-input',
-                tagIcon: 'input',
-                required: true,
+                label: '上传',
+                tag: 'el-upload',
+                tagIcon: 'upload',
                 layout: 'colFormItem',
-                span: 24,
-                document: 'https://element.eleme.cn/#/zh-CN/component/input',
-                regList: [
-                  {
-                    pattern: '/^1(3|4|5|7|8|9)\\d{9}$/',
-                    message: '手机号格式错误',
-                  },
-                ],
-              },
-              __slot__: {
-                prepend: '',
-                append: '',
-              },
-              __vModel__: 'mobile',
-              placeholder: '请输入手机号',
-              style: {
-                width: '100%',
-              },
-              clearable: true,
-              'prefix-icon': 'el-icon-mobile',
-              'suffix-icon': '',
-              maxlength: 11,
-              'show-word-limit': true,
-              readonly: false,
-              disabled: false,
-            },
-            {
-              __config__: {
-                label: '日期范围',
-                tag: 'el-date-picker',
-                tagIcon: 'date-range',
                 defaultValue: null,
-                span: 24,
                 showLabel: true,
                 labelWidth: null,
-                required: true,
-                layout: 'colFormItem',
+                required: false,
+                span: 24,
+                showTip: false,
+                buttonText: '点击上传',
                 regList: [],
                 changeTag: true,
-                document:
-                  'https://element.eleme.cn/#/zh-CN/component/date-picker',
-                formId: 101,
-                renderKey: 1585980082729,
+                fileSize: 2,
+                sizeUnit: 'MB',
+                formId: 'xOq2ud-p',
+                renderKey: 'xOq2ud-p',
+                columnType: 'fileImage',
               },
-              style: {
-                width: '100%',
-              },
-              type: 'daterange',
-              'range-separator': '至',
-              'start-placeholder': '开始日期',
-              'end-placeholder': '结束日期',
+              __slot__: { 'list-type': true },
+              action: 'http://172.16.2.19:8083/file/upload2',
               disabled: false,
-              clearable: true,
-              format: 'yyyy-MM-dd',
-              'value-format': 'yyyy-MM-dd',
-              readonly: false,
-              __vModel__: 'field101',
-            },
-            {
-              __config__: {
-                layout: 'rowFormItem',
-                tagIcon: 'row',
-                label: '行容器',
-                layoutTree: true,
-                children: [
-                  {
-                    __config__: {
-                      label: '评分',
-                      tag: 'el-rate',
-                      tagIcon: 'rate',
-                      defaultValue: 0,
-                      span: 24,
-                      showLabel: true,
-                      labelWidth: null,
-                      layout: 'colFormItem',
-                      required: true,
-                      regList: [],
-                      changeTag: true,
-                      document:
-                        'https://element.eleme.cn/#/zh-CN/component/rate',
-                      formId: 102,
-                      renderKey: 1586839671259,
-                    },
-                    style: {},
-                    max: 5,
-                    'allow-half': false,
-                    'show-text': false,
-                    'show-score': false,
-                    disabled: false,
-                    __vModel__: 'field102',
-                  },
-                ],
-                document: 'https://element.eleme.cn/#/zh-CN/component/layout',
-                formId: 101,
-                span: 24,
-                renderKey: 1586839668999,
-                componentName: 'row101',
-                gutter: 15,
+              accept: 'image/*',
+              name: 'file',
+              'auto-upload': true,
+              'list-type': 'text',
+              multiple: false,
+              allowable: [
+                'fileMatrix',
+                'fileImag',
+                'fileCurve',
+                'fileVideo',
+                'fileModel',
+              ],
+              __vModel__: 'test4',
+              on: {
+                'on-success': 'fileSuccess',
               },
-              type: 'default',
-              justify: 'start',
-              align: 'top',
+              // 'on-success': function(response, file, fileList) {
+              //   console.log(this)
+              //   console.log(response, file, fileList)
+              // },
             },
             {
               __config__: {
@@ -176,6 +108,9 @@
               )
               console.log('表单的Model：', this.formData)
               console.log('表单的ref：', this.$refs.elForm)
+            },
+            fileSuccess(response, file, fileList) {
+              console.log(response, file, fileList)
             },
           },
           formRef: 'elForm',

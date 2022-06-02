@@ -1,5 +1,6 @@
+/* eslint-disable prettier/prettier */
 export default {
-  options(h, conf) {
+  options (h, conf) {
     const list = []
     conf.__slot__.options.forEach((item) => {
       if (conf.__config__.optionType === 'button') {

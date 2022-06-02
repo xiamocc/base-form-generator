@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { deepClone } from '@/utils/index'
 
 const componentChild = {}
@@ -14,7 +15,37 @@ keys.forEach((key) => {
   componentChild[tag] = value
 })
 
-function vModel(dataObject, defaultValue) {
+function vModel (dataObject, defaultValue, config) {
+  if (
+    config !== undefined &&
+    config !== null &&
+    config !== '' &&
+    config.tag === 'el-upload'
+  ) {
+    dataObject.attrs['on-success'] = (response, file) => {
+      let toFile = {
+        name: file.name,
+        percentage: file.percentage,
+        type: file.raw.type,
+        res: response,
+        size: file.size,
+        status: 'success',
+        uid: file.uid,
+      }
+      this.$emit('upload', toFile)
+    }
+    dataObject.attrs['on-remove'] = (file, fileList) => {
+      this.$emit('deleteUpload', file, fileList)
+    }
+    if (
+      defaultValue !== undefined &&
+      defaultValue !== null &&
+      defaultValue !== ''
+    ) {
+      dataObject.attrs['file-list'] = defaultValue
+    }
+    return
+  }
   dataObject.props.value = defaultValue
 
   dataObject.on.input = (val) => {
@@ -22,7 +53,7 @@ function vModel(dataObject, defaultValue) {
   }
 }
 
-function mountSlotFiles(h, confClone, children) {
+function mountSlotFiles (h, confClone, children) {
   const childObjs = componentChild[confClone.__config__.tag]
   if (childObjs) {
     Object.keys(childObjs).forEach((key) => {
@@ -34,7 +65,7 @@ function mountSlotFiles(h, confClone, children) {
   }
 }
 
-function emitEvents(confClone) {
+function emitEvents (confClone) {
   ;['on', 'nativeOn'].forEach((attr) => {
     const eventKeyList = Object.keys(confClone[attr] || {})
     eventKeyList.forEach((key) => {
@@ -46,11 +77,16 @@ function emitEvents(confClone) {
   })
 }
 
-function buildDataObject(confClone, dataObject) {
+function buildDataObject (confClone, dataObject) {
   Object.keys(confClone).forEach((key) => {
     const val = confClone[key]
     if (key === '__vModel__') {
-      vModel.call(this, dataObject, confClone.__config__.defaultValue)
+      vModel.call(
+        this,
+        dataObject,
+        confClone.__config__.defaultValue,
+        confClone.__config__
+      )
     } else if (dataObject[key] !== undefined) {
       if (
         dataObject[key] === null ||
@@ -74,13 +110,13 @@ function buildDataObject(confClone, dataObject) {
   clearAttrs(dataObject)
 }
 
-function clearAttrs(dataObject) {
+function clearAttrs (dataObject) {
   delete dataObject.attrs.__config__
   delete dataObject.attrs.__slot__
   delete dataObject.attrs.__methods__
 }
 
-function makeDataObject() {
+function makeDataObject () {
   // 深入数据对象：
   // https://cn.vuejs.org/v2/guide/render-function.html#%E6%B7%B1%E5%85%A5%E6%95%B0%E6%8D%AE%E5%AF%B9%E8%B1%A1
   return {
@@ -107,7 +143,7 @@ export default {
       required: true,
     },
   },
-  render(h) {
+  render (h) {
     const dataObject = makeDataObject()
     const confClone = deepClone(this.conf)
     const children = this.$slots.default || []
